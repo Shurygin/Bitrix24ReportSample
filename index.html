@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="./bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div id="app">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="filterBeginTime">Начальное время интервала</label>
+                    <input type="date" class="form-control" id="filterBeginTime" v-model="filter.beginTime" >
+                </div>
+                <div class="form-group">
+                    <label for="filterEndTime">Конечное время интервала</label>
+                    <input type="date" class="form-control" id="filterEndTime" v-model="filter.endTime" >
+                </div>
+                <button type="submit" v-on:click="createReport" class="btn btn-default">Сформировать отчёт</button>
+                <button type="submit" id="exportButton" class="btn btn-default" onclick="tableToExcel('statsTable', 'Отчёт','Report.xls')">Экспорт в эксель</button>
+            </form>
+            <div class="center-block text-center" v-text="report.title"></div>
+        </div>
+
+        <script src="//api.bitrix24.com/api/v1/"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+        <script src="app.js"></script>
+        <script type="text/javascript">
+
+            var tableToExcel = (function() {
+                var uri = 'data:application/vnd.ms-excel;base64,'
+                    , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>'
+                    , base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                    , format = function(s, c) {
+                    return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; })
+                }
+                    , downloadURI = function(uri, name) {
+                    var link = document.createElement("a");
+                    link.download = name;
+                    link.href = uri;
+                    link.click();
+                }
+
+                return function(table, name, fileName) {
+                    if (!table.nodeType) table = document.getElementById(table)
+                    var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+                    var resuri = uri + base64(format(template, ctx))
+                    downloadURI(resuri, fileName);
+                }
+            })();
+
+        </script>
+    </body>    
+</html>
